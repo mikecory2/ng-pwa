@@ -1,0 +1,42 @@
+{
+  "name" : "CoffeRat",
+  "start_url": "/",
+  "orientation": "any",
+  "scope": "/",
+  "display": "standalone",
+  "short_name": "CoffeRat",
+  "theme_color": "#c2185b",
+  "background_color": "#424242",
+  "icons": [
+    {
+      "src": "icons/Icon_96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "icons/Icon_120.png",
+      "type": "image/png",
+      "sizes": "120x120"
+    },
+    {
+      "src": "icons/Icon_144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "icons/Icon_180.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    },
+    {
+      "src": "icons/Icon_192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icons/Icon_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
