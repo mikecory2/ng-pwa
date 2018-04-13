@@ -32,7 +32,6 @@ export class CoffeeComponent implements OnInit, OnDestroy {
     this.routingSubscription = this.route.params.subscribe(
       params => {
         if (params['id']) {
-          console.log('Params: ', params)
           this.itemDoc = this.afs.doc<Coffee>(`coffees/${params['id']}`);
           this.itemDoc.valueChanges().subscribe(coffee => this.coffee = coffee)
         }
