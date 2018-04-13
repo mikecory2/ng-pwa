@@ -10,6 +10,9 @@ import { NgModule } from '@angular/core';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { AppComponent } from './app.component';
 
+import { AngularFireModule } from 'angularfire2'
+import { AngularFirestoreModule } from 'angularfire2/firestore'
+
 import { environment } from '../environments/environment';
 
 import 'hammerjs';
@@ -18,6 +21,8 @@ import { CoffeeComponent } from './coffee/coffee.component'
 import { Routes, RouterModule } from '@angular/router'
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+
+
 
 const routes: Routes = [
   { path: '', component: ListComponent },
@@ -29,7 +34,7 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     ListComponent,
-    CoffeeComponent
+    CoffeeComponent,
   ],
   imports: [
     RouterModule.forRoot(routes),
@@ -46,6 +51,8 @@ const routes: Routes = [
     MatSnackBarModule,
     FormsModule,
     HttpClientModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [GeolocationService, DataService],

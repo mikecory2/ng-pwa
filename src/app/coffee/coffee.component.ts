@@ -1,9 +1,10 @@
-import { DataService } from './../data.service';
+import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { GeolocationService } from './../geolocation.service';
 import { Coffee } from './../logic/coffee';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TastingRating } from '../logic/tasting-rating';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-coffee',
@@ -15,24 +16,26 @@ export class CoffeeComponent implements OnInit, OnDestroy {
   private routingSubscription: any
 
   coffee: Coffee
+  private itemDoc: AngularFirestoreDocument<Coffee>
+  private itemsCollection: AngularFirestoreCollection<Coffee>;
   types: string[]
-  tastingEnabled: boolean
+
 
   // tslint:disable-next-line:max-line-length
-  constructor(private route: ActivatedRoute, private geoService: GeolocationService, private dataService: DataService, private router: Router) {
+  constructor(private afs: AngularFirestore, private route: ActivatedRoute, private geoService: GeolocationService, private router: Router) {
     this.types = ['Espresso', 'Ristretto', 'Americano', 'Cappuccino']
-    this.tastingEnabled = false
+    this.itemsCollection = afs.collection<Coffee>('coffees');
   }
 
   ngOnInit() {
     this.coffee = new Coffee()
     this.routingSubscription = this.route.params.subscribe(
       params => {
-        this.dataService.getCoffee(params['id'], (coffee: Coffee) => {
-            this.coffee = coffee;
-            (this.coffee.tastingRating) ? this.tastingEnabled = true : this.tastingEnabled = false
-          }
-        )
+        if (params.length) {
+          console.log('Params: ', params)
+          this.itemDoc = this.afs.doc<Coffee>(`coffees/${params['id']}`);
+          this.itemDoc.valueChanges().subscribe(coffee => this.coffee = coffee)
+        }
       }
     )
     this.geoService.requestLocation((location: Coordinates) => {
@@ -53,7 +56,16 @@ export class CoffeeComponent implements OnInit, OnDestroy {
     }
   }
 
-  cancel() { this.router.navigate(['/']) }
-  save() { this.dataService.save(this.coffee, result => (result) ? this.cancel() : console.log('save failed') ) }
+  cancel() {
+    this.router.navigate(['/'])
+  }
+  save() {
+    const data = JSON.parse(JSON.stringify(this.coffee));
+    if (this.itemDoc) {
+      this.itemDoc.update(data).then(() => this.cancel()).catch(() => console.log('update failed'))
+    } else {
+      this.itemsCollection.add(data).then(() => this.cancel()).catch(() => console.log('save failed'))
+    }
+  }
 
 }

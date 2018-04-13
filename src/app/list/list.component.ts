@@ -1,8 +1,9 @@
 import { GeolocationService } from './../geolocation.service';
 import { Router } from '@angular/router';
 import { Coffee } from './../logic/coffee';
-import { DataService } from './../data.service';
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { AngularFirestoreCollection, AngularFirestore } from 'angularfire2/firestore';
 
 @Component({
   selector: 'app-list',
@@ -11,15 +12,26 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ListComponent implements OnInit {
 
-  list: Coffee[]
+  private itemsCollection: AngularFirestoreCollection<Coffee>;
+  items: Observable<Coffee[]>;
 
-  constructor(private data: DataService, private router: Router, private geoService: GeolocationService) { }
+  constructor(private afs: AngularFirestore, private router: Router, private geoService: GeolocationService) {
+    this.itemsCollection = afs.collection<Coffee>('coffees');
 
-  ngOnInit() {
-     this.data.getList(list => {
-       this.list = list
-     })
+    // Does not havd id data
+    // this.items = this.itemsCollection.valueChanges();
+
+    // This calls has meta data like the id, which we need.
+    this.items = this.itemsCollection.snapshotChanges().map(actions => {
+      return actions.map(a => {
+        const data = a.payload.doc.data() as Coffee;
+        data._id = a.payload.doc.id;
+        return { ...data };
+      });
+    });
   }
+
+  ngOnInit() { }
 
   goToDetails(coffee: Coffee) {
     this.router.navigate(['/coffee', coffee._id])
